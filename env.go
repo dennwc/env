@@ -2,11 +2,9 @@
 package env
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -25,20 +23,15 @@ func String(key string, def string) string {
 }
 
 // Bool gets a bool variable from environment. It will use default if variable is empty or in wrong format.
-//
-// Bool is case-insensitive. Valid values are: [true, 1, t] and [false, 0, f].
 func Bool(key string, def bool) bool {
-	switch s := strings.ToLower(String(key, "")); s {
-	case "true", "t", "1":
-		return true
-	case "false", "f", "0":
-		return false
-	default:
-		if s != "" {
-			Log(key, fmt.Errorf("unknown bool value: '%s'", s))
+	if s := String(key, ""); s != "" {
+		if d, err := strconv.ParseBool(s); err == nil {
+			return d
+		} else {
+			Log(key, err)
 		}
-		return def
 	}
+	return def
 }
 
 // Int gets an int variable from environment. It will use default if variable is empty or in wrong format.
